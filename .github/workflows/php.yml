@@ -17,8 +17,7 @@ jobs:
         env:
           POSTGRES_DB: forge
           POSTGRES_USER: forge
-          # HACK: TestBench seems to assume blank password, at least w/GHA.
-          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_PASSWORD: secret
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -34,7 +33,7 @@ jobs:
       run: |
         sudo /etc/init.d/mysql start
         mysql -e 'CREATE DATABASE forge;' --user=root --password=root
-        mysql -e "CREATE USER 'forge'@'localhost' IDENTIFIED BY '';" --user=root --password=root
+        mysql -e "CREATE USER 'forge'@'localhost' IDENTIFIED BY 'secret';" --user=root --password=root
         mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'forge'@'localhost';" --user=root --password=root
 
     - uses: actions/checkout@v2
@@ -55,4 +54,4 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run test suite
-      run: composer run-script test
+      run: vendor/bin/phpunit --configuration phpunit.xml.github
