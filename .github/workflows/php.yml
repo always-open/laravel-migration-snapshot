@@ -10,10 +10,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+        fail-fast: true
+        matrix:
+            php: [ 8.3, 8.4 ]
+            laravel: [ 11.*, 12.* ]
+            stability: [ prefer-stable ]
+            postgres: [ 14, 16 ]
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_DB: forge
           POSTGRES_USER: forge
@@ -38,6 +45,13 @@ jobs:
         mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'forge'@'localhost';" --user=root --password=root
 
     - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: pcov
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
