@@ -442,9 +442,16 @@ final class MigrateDumpCommand extends Command
             }
 
             if ($migrationsTable === $table) {
-                $insert_rows = array_slice($output, 4, -1);
+                $insert_rows = array_filter(
+                    $output,
+                    function ($line) {
+                        return 0 !== preg_match('/^\s*(INSERT INTO\s)/iu', $line)
+                            && 0 < mb_strlen($line);
+                    }
+                );
+
                 $sorted = self::reorderMigrationRows($insert_rows);
-                array_splice($output, 4, -1, $sorted);
+                array_splice($output, array_key_first($insert_rows), -1, $sorted);
             }
 
             file_put_contents(

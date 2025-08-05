@@ -65,5 +65,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'migration' => '0000_00_00_000000_create_test_tables',
             'batch' => 1,
         ]);
+        \DB::table('migrations')->insert([
+            'migration' => '0000_00_00_000001_second_migration_for_testing',
+            'batch' => 1,
+        ]);
     }
 }
