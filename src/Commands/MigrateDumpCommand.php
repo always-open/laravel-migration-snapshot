@@ -22,8 +22,6 @@ final class MigrateDumpCommand extends Command
 
     public function handle()
     {
-        $exit_code = null;
-
         $database = $this->option('database') ?: DB::getDefaultConnection();
         DB::setDefaultConnection($database);
         $db_config = DB::getConfig();
