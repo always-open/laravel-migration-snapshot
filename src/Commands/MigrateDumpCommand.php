@@ -142,14 +142,15 @@ final class MigrateDumpCommand extends Command
      */
     private static function mysqlSchemaDump(array $db_config, string $schema_sql_path) : int
     {
-        // TODO: Suppress warning about insecure password.
         // CONSIDER: Intercepting stdout and stderr and converting to colorized
         // console output with `$this->info` and `->error`.
         passthru(
-            static::mysqlCommandPrefix($db_config)
+            'bash -c "'
+            . static::mysqlCommandPrefix($db_config)
             . ' --result-file=' . escapeshellarg($schema_sql_path)
             . ' --no-data'
-            . ' --routines',
+            . ' --routines'
+            . ' 2> >(grep -v \'Using a password on the command line interface can be insecure.\')"',
             $exit_code
         );
 
@@ -170,13 +171,15 @@ final class MigrateDumpCommand extends Command
 
         // Include migration rows to avoid unnecessary reruns conflicting.
         exec(
-            static::mysqlCommandPrefix($db_config)
+            'bash -c "'
+                . static::mysqlCommandPrefix($db_config)
                 . ' ' . ($db_config['prefix'] ?? '') . 'migrations'
                 . ' --no-create-info'
                 . ' --skip-extended-insert'
                 . ' --skip-routines'
                 . ' --single-transaction'
-                . ' --compact',
+                . ' --compact'
+                . ' 2> >(grep -v \'Using a password on the command line interface can be insecure.\')"',
             $output,
             $exit_code
         );
@@ -207,11 +210,13 @@ final class MigrateDumpCommand extends Command
     private static function mysqlDataDump(array $db_config, string $data_sql_path) : int
     {
         passthru(
-            static::mysqlCommandPrefix($db_config)
+            'bash -c "'
+            . static::mysqlCommandPrefix($db_config)
             . ' --result-file=' . escapeshellarg($data_sql_path)
             . ' --no-create-info --skip-routines --skip-triggers'
             . ' --ignore-table=' . escapeshellarg($db_config['database'] . '.' . ($db_config['prefix'] ?? '') . 'migrations')
-            . ' --single-transaction', // Avoid disruptive locks.
+            . ' --single-transaction' // Avoid disruptive locks.
+            . ' 2> >(grep -v \'Using a password on the command line interface can be insecure.\')"',
             $exit_code
         );
 
