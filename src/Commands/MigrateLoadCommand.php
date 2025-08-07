@@ -118,13 +118,15 @@ final class MigrateLoadCommand extends Command
         // CONSIDER: Making input file an option which can override default.
         // CONSIDER: Avoiding shell specifics like `cat` and piping using
         // `file_get_contents` or similar.
-        $command = 'cat ' . escapeshellarg($path)
+        $command = 'bash -c "'
+            . 'cat ' . escapeshellarg($path)
             . ' | mysql --no-beep'
             . ' --host=' . escapeshellarg($db_config['host'])
             . ' --port=' . escapeshellarg($db_config['port'] ?? 3306)
             . ' --user=' . escapeshellarg($db_config['username'])
             . ' --password=' . escapeshellarg($db_config['password'])
-            . ' --database=' . escapeshellarg($db_config['database']);
+            . ' --database=' . escapeshellarg($db_config['database'])
+            . ' 2> >(grep -v \'Using a password on the command line interface can be insecure.\')"';
         switch($verbosity) {
             case OutputInterface::VERBOSITY_QUIET:
                 $command .= ' -q';
