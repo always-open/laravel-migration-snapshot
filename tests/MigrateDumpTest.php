@@ -1,6 +1,5 @@
 <?php
 
-use AlwaysOpen\MigrationSnapshot\Commands\MigrateDumpCommand;
 use AlwaysOpen\MigrationSnapshot\Tests\TestCase;
 
 class MigrateDumpTest extends TestCase
@@ -30,9 +29,7 @@ class MigrateDumpTest extends TestCase
         $result = \Artisan::call('migrate:dump');
         $this->assertEquals(0, $result);
 
-        $schema_sql = file_get_contents(
-            database_path() . MigrateDumpCommand::SCHEMA_SQL_PATH_SUFFIX
-        );
+        $schema_sql = file_get_contents($this->schemaSqlPath);
         $this->assertStringNotContainsString('/*', $schema_sql);
     }
 }

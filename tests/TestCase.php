@@ -5,6 +5,7 @@ namespace AlwaysOpen\MigrationSnapshot\Tests;
 
 
 use AlwaysOpen\MigrationSnapshot\Commands\MigrateDumpCommand;
+use AlwaysOpen\MigrationSnapshot\ServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -17,9 +18,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        $this->schemaSqlPath = realpath(
-                __DIR__ . '/../vendor/orchestra/testbench-core/laravel/database'
-            ) . MigrateDumpCommand::SCHEMA_SQL_PATH_SUFFIX;
+        $this->schemaSqlPath = MigrateDumpCommand::getSchemaSqlPath(
+            $this->app['config']->get('database.connections.' . $this->dbDefault . '.driver')
+        );
         $this->schemaSqlDirectory = dirname($this->schemaSqlPath);
 
         // Not leaving to tearDown since it can be useful to see result after
@@ -44,7 +45,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getPackageProviders($app)
     {
-        return ['\AlwaysOpen\MigrationSnapshot\ServiceProvider'];
+        return [ServiceProvider::class];
     }
 
     protected function createTestTablesWithoutMigrate() : void
