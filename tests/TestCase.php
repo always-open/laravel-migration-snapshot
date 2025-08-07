@@ -39,7 +39,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $oldDbConnConfig = $app['config']->get('database.connections.' . $this->dbDefault) ?? [];
         $app['config']->set(
             'database.connections.' . $this->dbDefault,
-            ['prefix' => $this->dbPrefix] + $oldDbConnConfig
+            ['username' => 'root', 'prefix' => $this->dbPrefix] + $oldDbConnConfig
         );
     }
 
