@@ -59,8 +59,6 @@ class MigrateStartingHandler
             // Never implicitly load fresh (from file) in production since it
             // would need to drop first, and that would be destructive.
             && in_array(app()->environment(), explode(',', config('migration-snapshot.environments')), true)
-            // No point in implicitly loading when it's not present.
-            && file_exists(database_path() . MigrateDumpCommand::SCHEMA_SQL_PATH_SUFFIX)
         ) {
             // Must pass along options or it may use wrong DB or have
             // inconsistent output.
@@ -68,6 +66,12 @@ class MigrateStartingHandler
             $database = $options['--database'] ?? \DB::getConfig('name');
             $db_driver = \DB::connection($database)->getDriverName();
             if (! in_array($db_driver, MigrateDumpCommand::SUPPORTED_DB_DRIVERS, true)) {
+                // CONSIDER: Logging or emitting console warning.
+                return;
+            }
+
+            // No point in continuing to load when it's not present.
+            if (!file_exists(MigrateDumpCommand::getSchemaSqlPath($db_driver))) {
                 // CONSIDER: Logging or emitting console warning.
                 return;
             }

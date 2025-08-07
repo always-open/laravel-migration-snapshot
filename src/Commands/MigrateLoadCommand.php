@@ -20,21 +20,12 @@ final class MigrateLoadCommand extends Command
 
     public function handle()
     {
-        $exit_code = null;
-
         if (
             ! $this->option('force')
             && app()->environment('production')
-            && ! $this->confirm('Are you sure you want to load the DB schema from a file?')
+            && ! $this->confirm('Are you sure you want to load the database schema from a file?')
         ) {
             return;
-        }
-
-        $schema_sql_path = database_path() . MigrateDumpCommand::SCHEMA_SQL_PATH_SUFFIX;
-        if (! file_exists($schema_sql_path)) {
-            throw new InvalidArgumentException(
-                'Schema-migrations path not found, run `migrate:dump` first.'
-            );
         }
 
         $database = $this->option('database') ?: DB::getDefaultConnection();
@@ -43,7 +34,14 @@ final class MigrateLoadCommand extends Command
 
         if (! in_array($db_config['driver'], MigrateDumpCommand::SUPPORTED_DB_DRIVERS, true)) {
             throw new InvalidArgumentException(
-                'Unsupported DB driver ' . var_export($db_config['driver'], 1)
+                'Unsupported database driver ' . var_export($db_config['driver'], 1)
+            );
+        }
+
+        $schema_sql_path = MigrateDumpCommand::getSchemaSqlPath($db_config['driver']);
+        if (! file_exists($schema_sql_path)) {
+            throw new InvalidArgumentException(
+                'No schema dump found for the current database driver. Run `migrate:dump --database=' . $database . '` before running this command.'
             );
         }
 
@@ -71,9 +69,9 @@ final class MigrateLoadCommand extends Command
             exit($exit_code); // CONSIDER: Returning instead.
         }
 
-        $this->info('Loaded schema');
+        $this->info('Loaded ' . $db_config['driver'] . ' schema');
 
-        $data_path = database_path() . MigrateDumpCommand::DATA_SQL_PATH_SUFFIX;
+        $data_path = MigrateDumpCommand::getDataSqlPath($db_config['driver']);
         if ('pgsql' === $db_config['driver']) {
             $data_path = preg_replace('/\.sql$/', '.pgdump', $data_path);
         }

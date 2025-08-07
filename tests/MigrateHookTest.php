@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AlwaysOpen\MigrationSnapshot\Tests\Mysql;
 
 use AlwaysOpen\MigrationSnapshot\Tests\TestCase;
@@ -24,8 +23,8 @@ class MigrateHookTest extends TestCase
         $this->assertEquals(0, $result);
 
         $output_string = $output->fetch();
-        $this->assertStringContainsString('Loaded schema', $output_string);
-        $this->assertStringContainsString('Dumped schema', $output_string);
+        $this->assertStringContainsString('Loaded ' . $this->dbDefault . ' schema', $output_string);
+        $this->assertStringContainsString('Dumped ' . $this->dbDefault . ' schema', $output_string);
     }
 
     public function test_handle_dumpsOnFresh()
@@ -43,7 +42,7 @@ class MigrateHookTest extends TestCase
         $this->assertEquals(0, $result);
 
         $output_string = $output->fetch();
-        $this->assertStringContainsString('Dumped schema', $output_string);
+        $this->assertStringContainsString('Dumped ' . $this->dbDefault . ' schema', $output_string);
     }
 
     public function test_handle_dumpsOnRollback()
@@ -62,7 +61,7 @@ class MigrateHookTest extends TestCase
         $this->assertEquals(0, $result);
 
         $output_string = $output->fetch();
-        $this->assertStringContainsString('Dumped schema', $output_string);
+        $this->assertStringContainsString('Dumped ' . $this->dbDefault . ' schema', $output_string);
     }
 
     public function test_handle_doesNotLoadWhenDbHasMigrated()
@@ -79,7 +78,7 @@ class MigrateHookTest extends TestCase
         $this->assertEquals(0, $result);
 
         $output_string = $output->fetch();
-        $this->assertStringNotContainsString('Loaded schema', $output_string);
+        $this->assertStringNotContainsString('Loaded ' . $this->dbDefault . ' schema', $output_string);
 
         $this->assertEquals(1, \DB::table('test_ms')->count());
     }

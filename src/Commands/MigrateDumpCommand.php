@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 final class MigrateDumpCommand extends Command
 {
-    public const SCHEMA_SQL_PATH_SUFFIX = '/migrations/sql/schema.sql';
-    public const DATA_SQL_PATH_SUFFIX = '/migrations/sql/data.sql';
-
     public const SUPPORTED_DB_DRIVERS = ['mysql', 'pgsql', 'sqlite'];
+    protected const SCHEMA_SQL_PATH_SUFFIX = 'migrations/sql/schema.';
+    protected const DATA_SQL_PATH_SUFFIX = 'migrations/sql/data.';
 
     protected $signature = 'migrate:dump
         {--database= : The database connection to use}
@@ -22,15 +21,11 @@ final class MigrateDumpCommand extends Command
 
     public function handle()
     {
-        $exit_code = null;
-
         $database = $this->option('database') ?: DB::getDefaultConnection();
         DB::setDefaultConnection($database);
         $db_config = DB::getConfig();
 
-        // CONSIDER: Ending with ".mysql" or "-mysql.sql" unless in
-        // compatibility mode.
-        $schema_sql_path = database_path() . self::SCHEMA_SQL_PATH_SUFFIX;
+        $schema_sql_path = self::getSchemaSqlPath($db_config['driver']);
         $schema_sql_directory = dirname($schema_sql_path);
         if (! file_exists($schema_sql_directory)) {
             mkdir($schema_sql_directory, 0755);
@@ -38,7 +33,7 @@ final class MigrateDumpCommand extends Command
 
         if (! in_array($db_config['driver'], self::SUPPORTED_DB_DRIVERS, true)) {
             throw new \InvalidArgumentException(
-                'Unsupported DB driver ' . var_export($db_config['driver'], 1)
+                'Unsupported database driver ' . var_export($db_config['driver'], 1)
             );
         }
 
@@ -61,13 +56,13 @@ final class MigrateDumpCommand extends Command
             exit($exit_code); // CONSIDER: Returning instead.
         }
 
-        $this->info('Dumped schema');
+        $this->info('Dumped ' . $db_config['driver'] . ' schema');
 
         $data_path = null;
         if ($this->option('include-data')) {
             $this->info('Starting Data Dump');
 
-            $data_path = database_path() . self::DATA_SQL_PATH_SUFFIX;
+            $data_path = self::getDataSqlPath($db_config['driver']);
             if ('pgsql' === $db_config['driver']) {
                 $data_path = preg_replace('/\.sql$/', '.pgdump', $data_path);
             }
@@ -132,6 +127,16 @@ final class MigrateDumpCommand extends Command
         }
 
         return $output;
+    }
+
+    public static function getSchemaSqlPath(string $driver) : string
+    {
+        return database_path(self::SCHEMA_SQL_PATH_SUFFIX . $driver . '.sql');
+    }
+
+    public static function getDataSqlPath(string $driver) : string
+    {
+        return database_path(self::DATA_SQL_PATH_SUFFIX . $driver . '.sql');
     }
 
     /**
