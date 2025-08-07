@@ -25,8 +25,6 @@ final class MigrateDumpCommand extends Command
         DB::setDefaultConnection($database);
         $db_config = DB::getConfig();
 
-        // CONSIDER: Ending with ".mysql" or "-mysql.sql" unless in
-        // compatibility mode.
         $schema_sql_path = self::getSchemaSqlPath($db_config['driver']);
         $schema_sql_directory = dirname($schema_sql_path);
         if (! file_exists($schema_sql_directory)) {
