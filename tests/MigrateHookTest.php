@@ -42,7 +42,7 @@ class MigrateHookTest extends TestCase
         $this->assertEquals(0, $result);
 
         $output_string = $output->fetch();
-        $this->assertStringContainsString('Dumped schema', $output_string);
+        $this->assertStringContainsString('Dumped ' . $this->dbDefault . ' schema', $output_string);
     }
 
     public function test_handle_dumpsOnRollback()
