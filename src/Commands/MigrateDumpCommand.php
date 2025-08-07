@@ -186,7 +186,7 @@ final class MigrateDumpCommand extends Command
                 . ' --skip-routines'
                 . ' --single-transaction'
                 . ' --compact'
-            . ' 2> >(grep -v \'Using a password on the command line interface can be insecure.\')"',
+                . ' 2> >(grep -v \'Using a password on the command line interface can be insecure.\')"',
             $output,
             $exit_code
         );
