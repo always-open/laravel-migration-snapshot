@@ -11,8 +11,7 @@ class MigrateFinishedHandler
     public function handle(CommandFinished $event)
     {
         if (
-            // CONSIDER: Also `migrate:fresh`.
-            in_array($event->command, ['migrate', 'migrate:rollback'], true)
+            in_array($event->command, ['migrate', 'migrate:fresh', 'migrate:rollback'], true)
             && ! $event->input->hasParameterOption(['--help', '--pretend', '-V', '--version'])
             && config('migration-snapshot.dump', true)
             && in_array(app()->environment(), explode(',', config('migration-snapshot.environments')), true)
