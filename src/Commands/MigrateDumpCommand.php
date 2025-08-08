@@ -29,6 +29,8 @@ final class MigrateDumpCommand extends Command
         $schema_sql_directory = dirname($schema_sql_path);
         if (! file_exists($schema_sql_directory)) {
             mkdir($schema_sql_directory, 0755);
+        } elseif (file_exists($schema_sql_path)) {
+            unlink($schema_sql_path);
         }
 
         if (! in_array($db_config['driver'], self::SUPPORTED_DB_DRIVERS, true)) {
@@ -65,6 +67,10 @@ final class MigrateDumpCommand extends Command
             $data_path = self::getDataSqlPath($db_config['driver']);
             if ('pgsql' === $db_config['driver']) {
                 $data_path = preg_replace('/\.sql$/', '.pgdump', $data_path);
+            }
+
+            if (file_exists($data_path)) {
+                unlink($data_path);
             }
 
             $method = $db_config['driver'] . 'DataDump';
