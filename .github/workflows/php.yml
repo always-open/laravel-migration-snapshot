@@ -13,10 +13,10 @@ jobs:
     strategy:
         fail-fast: true
         matrix:
-            php: [ 8.3, 8.4 ]
-            laravel: [ 11.*, 12.* ]
+            php: [ 8.3, 8.4, 8.5 ]
+            laravel: [ 11.*, 12.*, 13.* ]
             stability: [ prefer-stable ]
-            postgres: [ 14, 16 ]
+            postgres: [ 16, 18 ]
 
     services:
       postgres:
