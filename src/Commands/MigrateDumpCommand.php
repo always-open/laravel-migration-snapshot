@@ -347,7 +347,7 @@ final class MigrateDumpCommand extends Command
             static::pgsqlCommandPrefix($db_config)
             . ' --table=' . escapeshellarg($migrationsTable)
             . ' --data-only'
-            . ' --inserts | sed -e \'/^\\restrict/d\' -e \'/^\\unrestrict/d\'',
+            . ' --inserts | sed -e \'/^\\\\restrict/d\' -e \'/^\\\\unrestrict/d\'',
             $output,
             $exit_code
         );
