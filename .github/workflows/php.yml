@@ -16,7 +16,8 @@ jobs:
             php: [ 8.3, 8.4, 8.5 ]
             laravel: [ 11.*, 12.*, 13.* ]
             stability: [ prefer-stable ]
-            postgres: [ 16, 18 ]
+            # TODO: Install Pg_dump 18 and restore here.
+            postgres: [ 16 ]
 
     services:
       postgres:
