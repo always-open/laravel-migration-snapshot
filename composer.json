@@ -25,13 +25,13 @@
     ],
     "require": {
         "ext-mbstring": "*",
-        "php": "~7.3|~8.0.0|~8.1.0|~8.2.0|~8.3.0|~8.4.0",
-        "laravel/framework": "^8.0|^9.0|^10.0|^11.0|^12"
+        "php": "~8.2.0|~8.3.0|~8.4.0|~8.5.0",
+        "laravel/framework": "^11.0|^12|^13"
     },
     "require-dev": {
         "mockery/mockery": "~1.0",
-        "orchestra/testbench": "^7.0",
-        "phpunit/phpunit": "^9.0"
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.0"
     },
     "autoload": {
         "psr-4": {
@@ -40,12 +40,27 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "AlwaysOpen\\MigrationSnapshot\\Tests\\": "tests"
+            "AlwaysOpen\\MigrationSnapshot\\Tests\\": "tests",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ]
     },
     "config": {
         "sort-packages": true
