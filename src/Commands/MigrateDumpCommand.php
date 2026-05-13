@@ -360,7 +360,8 @@ final class MigrateDumpCommand extends Command
         $output = array_filter(
             $output,
             function ($line) {
-                return 0 === preg_match('/^\s*(--|SELECT\s|SET\s)/iu', $line)
+                // Keep SELECT for `setval` so future migration IDs don't conflict.
+                return 0 === preg_match('/^\s*(--|SET\s)/iu', $line)
                     && 0 < mb_strlen($line);
             }
         );
