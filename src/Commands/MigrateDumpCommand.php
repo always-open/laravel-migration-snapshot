@@ -108,6 +108,9 @@ final class MigrateDumpCommand extends Command
         if (config('migration-snapshot.reorder')) {
             $reordered = [];
             foreach ($output as $line) {
+                if (str_starts_with($line, 'SELECT ')) {
+                    continue; // Disregard `setval` and pgcatalog lines.
+                }
                 // Extract parts of "INSERT ... VALUES ([id],'[ver]',[batch])
                 // where version begins with "YYYY_MM_DD_HHMMSS".
                 $occurrences = preg_match(
@@ -360,7 +363,8 @@ final class MigrateDumpCommand extends Command
         $output = array_filter(
             $output,
             function ($line) {
-                return 0 === preg_match('/^\s*(--|SELECT\s|SET\s)/iu', $line)
+                // Keep SELECT for `setval` so future migration IDs don't conflict.
+                return 0 === preg_match('/^\s*(--|SET\s)/iu', $line)
                     && 0 < mb_strlen($line);
             }
         );
